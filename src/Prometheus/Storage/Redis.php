@@ -13,13 +13,13 @@ class Redis implements Adapter
 {
     const PROMETHEUS_METRIC_KEYS_SUFFIX = '_METRIC_KEYS';
 
-    private static $defaultOptions = array();
+    private static $defaultOptions = [];
     private static $prefix = 'PROMETHEUS_';
 
     private $options;
     private $redis;
 
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         // with php 5.3 we cannot initialize the options directly on the field definition
         // so we initialize them here for now

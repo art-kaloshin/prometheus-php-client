@@ -5,6 +5,7 @@ namespace Prometheus;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 class PushGateway
 {
@@ -55,12 +56,12 @@ class PushGateway
     }
 
     /**
-     * @param CollectorRegistry $collectorRegistry
+     * @param CollectorRegistry|null $collectorRegistry
      * @param $job
      * @param $groupingKey
      * @param $method
      */
-    private function doRequest(CollectorRegistry $collectorRegistry, $job, $groupingKey, $method)
+    private function doRequest(?CollectorRegistry $collectorRegistry, $job, $groupingKey, $method)
     {
         $url = "http://" . $this->address . "/metrics/job/" . $job;
         if (!empty($groupingKey)) {
@@ -68,23 +69,32 @@ class PushGateway
                 $url .= "/" . $label . "/" . $value;
             }
         }
-        $client = new Client();
-        $requestOptions = array(
-            'headers' => array(
-                'Content-Type' => RenderTextFormat::MIME_TYPE
-            ),
+        
+        $client = new Client([
             'connect_timeout' => 10,
             'timeout' => 20,
-        );
+        ]);
+        
+        $requestOptions = [
+            'headers' => [
+                'Content-Type' => RenderTextFormat::MIME_TYPE
+            ],
+        ];
+        
         if ($method != 'delete') {
             $renderer = new RenderTextFormat();
             $requestOptions['body'] = $renderer->render($collectorRegistry->getMetricFamilySamples());
         }
-        $response = $client->request($method, $url, $requestOptions);
-        $statusCode = $response->getStatusCode();
-        if ($statusCode != 202) {
-            $msg = "Unexpected status code " . $statusCode . " received from pushgateway " . $this->address . ": " . $response->getBody();
-            throw new \RuntimeException($msg);
+        
+        try {
+            $response = $client->request($method, $url, $requestOptions);
+            $statusCode = $response->getStatusCode();
+            if ($statusCode != 202) {
+                $msg = "Unexpected status code " . $statusCode . " received from pushgateway " . $this->address . ": " . $response->getBody();
+                throw new \RuntimeException($msg);
+            }
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            throw new \RuntimeException("Failed to push metrics to pushgateway: " . $e->getMessage(), 0, $e);
         }
     }
 

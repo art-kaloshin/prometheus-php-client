@@ -2,6 +2,7 @@
 
 namespace Prometheus;
 
+use Throwable;
 
 class RenderTextFormat
 {
@@ -26,7 +27,7 @@ class RenderTextFormat
             foreach ($metric->getSamples() as $sample) {
                 try {
                     $lines[] = $this->renderSample($metric, $sample);    
-                } catch (\Exception $e) {
+                } catch (Throwable $e) {
                     error_log("Error rendering sample: " . $e->getMessage());
                 }                
             }

@@ -63,6 +63,10 @@ class PushGateway
      */
     private function doRequest(?CollectorRegistry $collectorRegistry, $job, $groupingKey, $method)
     {
+        if (!$collectorRegistry) {
+            return;
+        }
+        
         $url = "http://" . $this->address . "/metrics/job/" . $job;
         if (!empty($groupingKey)) {
             foreach ($groupingKey as $label => $value) {

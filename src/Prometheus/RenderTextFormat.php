@@ -24,7 +24,11 @@ class RenderTextFormat
             $lines[] = "# HELP " . $metric->getName() . " {$metric->getHelp()}";
             $lines[] = "# TYPE " . $metric->getName() . " {$metric->getType()}";
             foreach ($metric->getSamples() as $sample) {
-                $lines[] = $this->renderSample($metric, $sample);
+                try {
+                    $lines[] = $this->renderSample($metric, $sample);    
+                } catch (\Exception $e) {
+                    error_log("Error rendering sample: " . $e->getMessage());
+                }                
             }
         }
         return implode("\n", $lines) . "\n";

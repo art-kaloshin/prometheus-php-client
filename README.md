@@ -90,11 +90,20 @@ Also look at the [examples](examples).
 
 ### Dependencies
 
-* PHP 5.6
+* PHP 8.0+
 * PHP Redis extension
 * PHP APCu extension
 * [Composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx)
 * Redis
+* Guzzle HTTP Client 7.0+
+
+### Совместимость
+
+Библиотека полностью совместима с:
+- **PHP 8.0+** - обновлен синтаксис и улучшена типизация
+- **Guzzle 7.0+** - улучшена обработка HTTP запросов и исключений
+
+Подробная информация о совместимости: [COMPATIBILITY.md](COMPATIBILITY.md)
 
 Start a Redis instance:
 ```
